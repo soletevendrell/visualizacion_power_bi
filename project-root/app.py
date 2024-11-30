@@ -51,13 +51,30 @@ def process_and_upload_to_sqlite(filepath):
         conn = sqlite3.connect(DATABASE_PATH)
         table_name = os.path.splitext(os.path.basename(filepath))[0]
 
+        print(f"Creando tabla: {table_name}")
         # Guardar los datos en SQLite
         data.to_sql(table_name, conn, if_exists='replace', index=False)
-        conn.close()
+        
+        # Verificar tablas existentes
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        print(f"Tablas existentes: {tables}")
 
+        conn.close()
         print(f"Datos cargados en SQLite desde {filepath}")
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
+
+if filepath.endswith('.csv'):
+    data = pd.read_csv(filepath)
+elif filepath.endswith(('.xls', '.xlsx')):
+    data = pd.read_excel(filepath)
+else:
+    print(f"Formato no soportado: {filepath}")
+    return
+
+print(f"Vista previa de los datos:\n{data.head()}")
 
 if __name__ == '__main__':
     app.run(debug=True)
