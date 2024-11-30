@@ -106,6 +106,23 @@ def show_table(table_name):
     except Exception as e:
         return f"Error al mostrar la tabla {table_name}: {e}"
 
+@app.route('/delete_table/<table_name>', methods=['POST'])
+def delete_table(table_name):
+    try:
+        # Conectar a la base de datos
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
+        
+        # Ejecutar el comando para eliminar la tabla
+        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('list_tables'))  # Redirige a la lista de tablas
+    except Exception as e:
+        return f"Error al eliminar la tabla {table_name}: {e}"
+
+
 @app.route('/join_tables', methods=['GET', 'POST'])
 def join_tables():
     if request.method == 'POST':

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablas en la Base de Datos</title>
+    <title>SISTEMA DE VISUALIZACIÓN DE DATOS</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -11,13 +11,43 @@
         <h1>Tablas en la Base de Datos</h1>
     </header>
     <main>
+        <p>Explore las tablas ya subidas y procesadas en la base de datos</p>
+
         <ul>
             {% for table in tables %}
                 <li><a href="/table/{{ table }}">{{ table }}</a></li>
+                <button onclick="showPopup('{{ table }}')">Eliminar</button>
             {% endfor %}
         </ul>
         {{ data|safe }}
         <a href="{{ url_for('index') }}">Volver al Inicio</a>
+        <a href="{{ url_for('join_tables') }}">Relacionar tablas</a>
     </main>
+
+    <!-- Pop-Up Personalizado -->
+    <div id="deletePopup" class="popup hidden">
+        <div class="popup-content">
+            <h2>Confirmación de Eliminación</h2>
+            <p>¿Está seguro de que quiere eliminar la tabla <span id="tableName"></span> de la base de datos?</p>
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="confirm">Confirmar</button>
+                <button type="button" class="cancel" onclick="closePopup()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Mostrar el pop-up
+        function showPopup(tableName) {
+            document.getElementById('tableName').textContent = tableName;
+            const deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = `/delete_table/${tableName}`;
+            document.getElementById('deletePopup').classList.remove('hidden');
+        }
+
+        // Cerrar el pop-up
+        function closePopup() {
+            document.getElementById('deletePopup').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>

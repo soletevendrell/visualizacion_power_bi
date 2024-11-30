@@ -14,13 +14,42 @@
 </head>
 <body>
     <header>
-        <h1>Sistema de Visualización de Datos</h1>
+        <h1>SISTEMA DE VISUALIZACIÓN DE DATOS</h1>
     </header>
     <main>
-        <a href="/upload" class="button"><img src="/static/images/upload_archivos.png" alt="Subir Archivos" class="icon"> Subir Archivos</a>
-        <a href="/tables" class="button"><img src="/static/images/visualizar_archivos.png" alt="Ver Tablas" class="icon"> Ver Tablas</a>
-        <a href="/join_tables" class="button"><img src="/static/images/join_archivos.png" alt="Relacionar Tablas" class="icon"> Relacionar Tablas</a>
-
+        <div class="grid-container">
+            <a href="/upload" class="grid-item upload">
+                <div class="overlay">
+                    <h2> SUBIR TABLAS </h2>
+                </div>
+            </a>
+            <a href="/tables" class="grid-item tables">
+                <div class="overlay">
+                    <h2>VISUALIZAR TABLAS</h2>
+                </div>
+            </a>
+            <a href="/join_tables" class="grid-item join">
+                <div class="overlay">
+                    <h2>RELACIONAR TABLAS</h2>
+                </div>
+            </a>
+        </div>
     </main>
+<!--
+    <main>
+        <div class="button-container">
+            <p>Sube archivos en formato CSV o Excel para procesarlos y almacenarlos en la base de datos.</p>
+            <a href="/upload" class="button"><img src="/static/images/upload_archivos.png" alt="Subir Archivos" class="icon"> Subir Archivos</a>
+        </div>
+        <div class="button-container">
+            <p>Explora las tablas ya subidas y procesadas en la base de datos.</p>
+            <a href="/tables" class="button"><img src="/static/images/visualizar_archivos.png" alt="Ver Tablas" class="icon"> Ver Tablas</a>
+        </div>
+        <div class="button-container">
+            <p>Relaciona tablas utilizando columnas comunes para obtener vistas combinadas de los datos.</p>
+            <a href="/join_tables" class="button"><img src="/static/images/join_archivos.png" alt="Relacionar Tablas" class="icon"> Relacionar Tablas</a>
+        </div>
+    </main>
+-->
 </body>
 </html>

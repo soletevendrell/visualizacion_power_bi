@@ -26,9 +26,194 @@ main {
 main a {
     text-decoration: none;
     padding: 0.5rem 1rem;
-    background-color: #336699;
     color: #fff;
     border-radius: 5px;
     margin-top: 1rem;
     display: inline-block;
+    background-color: #336699;
+}
+
+.button-container {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    background-color: #2a6fb4c5;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #3366996e;
+}
+
+p {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #000000;
+    text-align: center;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Divide en 3 columnas iguales */
+    gap: 1rem; /* Espacio entre las cajas */
+    width: 100%; /* Ocupa todo el ancho */
+    height: 75vh; /* Ajusta la altura al 100% de la ventana */
+    margin: 0; /* Elimina márgenes externos */
+    padding: 0; /* Elimina el relleno externo */
+}
+
+.grid-item {
+    position: relative;
+    overflow: hidden;
+    height: 100%; /* Ocupa toda la altura disponible */
+    border-radius: 2px;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: blur(1px); /* Solo afecta al fondo */
+    cursor: pointer;
+
+    /* Flexbox para centrar contenido */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-item:hover {
+    filter: blur(0);
+    transform: scale(1.05);
+}
+
+.grid-item .overlay {
+    position: absolute; /* Capa separada del fondo */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex; /* Activa el modelo Flexbox */
+    flex-direction: column; /* Organiza el contenido en columna */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    z-index: 1; /* Capa superior al fondo */
+    text-align: center;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Mejora la visibilidad */
+    pointer-events: none; /* Evita que el cursor interfiera con el texto */
+}
+
+/*.grid-item:hover .overlay {
+    background: rgba(0, 0, 0, 0.9);
+}*/
+
+.grid-item p {
+    position: relative; /* Asegura que no esté afectado por el filtro */
+    filter: none;
+    opacity: 1; /* Elimina cualquier efecto de desenfoque */
+    z-index: 1; /* Coloca el texto en la capa superior */
+    margin: 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: white; /* Contraste para la visibilidad */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Mejora la legibilidad */
+}
+
+
+/* Specific backgrounds for each grid item */
+.grid-item.upload {
+    background-image: url('/static/images/upload_archivos.png');
+}
+
+.grid-item.tables {
+    background-image: url('/static/images/visualizar_archivos.png');
+}
+
+.grid-item.join {
+    background-image: url('/static/images/join_archivos.png');
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f4f4f4;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content h2 {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+}
+
+.popup-content p {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.popup-content button {
+    padding: 10px 15px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.popup-content .confirm {
+    background-color: #2a6fb4c5;
+    color: white;
+}
+
+.popup-content .confirm:hover {
+    background-color: #2a6fb4c5;
+}
+
+.popup-content .cancel {
+    background-color: #ddd;
+    color: black;
+}
+
+.popup-content .cancel:hover {
+    background-color: #bbb;
 }

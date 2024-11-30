@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subir Archivos</title>
+    <title>SISTEMA DE VISUALIZACIÓN DE DATOS</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <header>
-        <h1>Subir Archivos</h1>
+        <h1>SUBIR ARCHIVOS</h1>
     </header>
     <main>
+        <p>Suba archivos en formato CSV o Excel para procesarlos y almacenarlos en la base de datos</p>
         <form action="/upload" method="POST" enctype="multipart/form-data">
             <input type="file" name="files[]" multiple>
             <button type="submit">Subir</button>
         </form>
         {{ data|safe }}
-        <a href="{{ request.referrer }}">Volver a Inicio</a>
+        <a href="{{ url_for('index') }}">Volver a Inicio</b>
     </main>
 </body>
 </html>
