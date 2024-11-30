@@ -64,17 +64,39 @@ def process_and_upload_to_sqlite(filepath):
         conn.close()
         print(f"Datos cargados en SQLite desde {filepath}")
 
-        if filepath.endswith('.csv'):
-            data = pd.read_csv(filepath)
-        elif filepath.endswith(('.xls', '.xlsx')):
-            data = pd.read_excel(filepath)
-        else:
-            print(f"Formato no soportado: {filepath}")
-            return
+#        if filepath.endswith('.csv'):
+#            data = pd.read_csv(filepath)
+#        elif filepath.endswith(('.xls', '.xlsx')):
+#            data = pd.read_excel(filepath)
+#        else:
+#            print(f"Formato no soportado: {filepath}")
+#            return
 
         print(f"Vista previa de los datos:\n{data.head()}")
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
+
+@app.route('/tables')
+def list_tables():
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        return render_template('tables.html', tables=tables)
+    except Exception as e:
+        return f"Error al listar tablas: {e}"
+
+@app.route('/table/<table_name>')
+def show_table(table_name):
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+        conn.close()
+        return render_template('table.html', table_name=table_name, data=df.to_html(index=False))
+    except Exception as e:
+        return f"Error al mostrar la tabla {table_name}: {e}"
 
 
 if __name__ == '__main__':
