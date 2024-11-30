@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relacionar Tablas</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Relacionar Tablas</h1>
+    </header>
+    <form method="POST" action="/join_tables">
+        <h2>Seleccione la Primera Tabla</h2>
+        <select name="table1">
+            {% for table in tables %}
+                <option value="{{ table }}">{{ table }}</option>
+            {% endfor %}
+        </select>
+        <select name="column1">
+            {% for table, cols in columns.items() %}
+                {% for col in cols %}
+                    <option value="{{ col }}">{{ col }}</option>
+                {% endfor %}
+            {% endfor %}
+        </select>
+
+        <h2>Seleccione la Segunda Tabla</h2>
+        <select name="table2">
+            {% for table in tables %}
+                <option value="{{ table }}">{{ table }}</option>
+            {% endfor %}
+        </select>
+        <select name="column2">
+            {% for table, cols in columns.items() %}
+                {% for col in cols %}
+                    <option value="{{ col }}">{{ col }}</option>
+                {% endfor %}
+            {% endfor %}
+        </select>
+
+        <button type="submit">Relacionar</button>
+    </form>
+    <main>
+        {{ data|safe }}
+        <a href="{{ request.referrer }}">Volver a las Tablas</a>
+    </main>
+</body>
+</html>

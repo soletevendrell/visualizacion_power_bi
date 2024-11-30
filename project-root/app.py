@@ -10,6 +10,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 DATABASE_PATH = 'mi_base_local.db'
+ALLOWED_EXTENSIONS = {'csv', 'xls', 'xlsx'}
 
 conn = sqlite3.connect('mi_base_local.db')
 conn.close()
@@ -18,6 +19,12 @@ conn.close()
 def index():
     return render_template('index.html')
 
+def allowed_file(filename):
+    """
+    Verifica si un archivo tiene una extensión permitida.
+    """
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -25,7 +32,7 @@ def upload_file():
             return "No file part"
         files = request.files.getlist('files[]')
         for file in files:
-            if file:
+            if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
@@ -42,7 +49,7 @@ def process_and_upload_to_sqlite(filepath):
         if filepath.endswith('.csv'):
             data = pd.read_csv(filepath)
         elif filepath.endswith(('.xls', '.xlsx')):
-            data = pd.read_excel(filepath)
+            data = pd.read_excel(filepath, engine='openpyxl')
         else:
             print(f"Formato no soportado: {filepath}")
             return
@@ -99,6 +106,38 @@ def show_table(table_name):
     except Exception as e:
         return f"Error al mostrar la tabla {table_name}: {e}"
 
+@app.route('/join_tables', methods=['GET', 'POST'])
+def join_tables():
+    if request.method == 'POST':
+        table1 = request.form.get('table1')
+        column1 = request.form.get('column1')
+        table2 = request.form.get('table2')
+        column2 = request.form.get('column2')
+        
+        try:
+            conn = sqlite3.connect(DATABASE_PATH)
+            query = f"""
+            SELECT * FROM {table1}
+            INNER JOIN {table2}
+            ON {table1}.{column1} = {table2}.{column2};
+            """
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+            return render_template('joined_table.html', data=df.to_html(index=False))
+        except Exception as e:
+            return f"Error al unir tablas: {e}"
+
+    # Obtener lista de tablas y columnas para el formulario
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = [row[0] for row in cursor.fetchall()]
+    columns = {}
+    for table in tables:
+        cursor.execute(f"PRAGMA table_info({table});")
+        columns[table] = [col[1] for col in cursor.fetchall()]
+    conn.close()
+    return render_template('join_tables.html', tables=tables, columns=columns)
 
 if __name__ == '__main__':
     app.run(debug=True)

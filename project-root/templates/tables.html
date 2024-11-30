@@ -16,6 +16,8 @@
                 <li><a href="/table/{{ table }}">{{ table }}</a></li>
             {% endfor %}
         </ul>
+        {{ data|safe }}
+        <a href="{{ url_for('index') }}">Volver al Inicio</a>
     </main>
 </body>
 </html>
