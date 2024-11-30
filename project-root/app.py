@@ -63,18 +63,19 @@ def process_and_upload_to_sqlite(filepath):
 
         conn.close()
         print(f"Datos cargados en SQLite desde {filepath}")
+
+        if filepath.endswith('.csv'):
+            data = pd.read_csv(filepath)
+        elif filepath.endswith(('.xls', '.xlsx')):
+            data = pd.read_excel(filepath)
+        else:
+            print(f"Formato no soportado: {filepath}")
+            return
+
+        print(f"Vista previa de los datos:\n{data.head()}")
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
 
-if filepath.endswith('.csv'):
-    data = pd.read_csv(filepath)
-elif filepath.endswith(('.xls', '.xlsx')):
-    data = pd.read_excel(filepath)
-else:
-    print(f"Formato no soportado: {filepath}")
-    return
-
-print(f"Vista previa de los datos:\n{data.head()}")
 
 if __name__ == '__main__':
     app.run(debug=True)
