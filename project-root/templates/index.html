@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio</title>
     <link rel="stylesheet" href="/static/css/style.css">
+<style>.button img {
+    height: 24px;
+    width: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}</style>
 </head>
 <body>
     <header>
         <h1>Bienvenido al Sistema de Visualización de Datos</h1>
     </header>
     <main>
-        <a href="/upload">Subir Archivos</a>
-        <a href="/tables">Ver Tablas</a>
+        <a href="/upload" class="button"><img src="/static/images/upload_archivos.png" alt="Subir Archivos" class="icon"> Subir Archivos</a>
+        <a href="/tables" class="button"><img src="/static/images/visualizar_archivos.png" alt="Ver Tablas" class="icon"> Ver Tablas</a>
     </main>
 </body>
 </html>
