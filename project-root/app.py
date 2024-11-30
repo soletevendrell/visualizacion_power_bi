@@ -11,6 +11,9 @@ app.config['UPLOAD_FOLDER'] = 'uploads/'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 DATABASE_PATH = 'mi_base_local.db'
 
+conn = sqlite3.connect('mi_base_local.db')
+conn.close()
+
 @app.route('/')
 def index():
     return render_template('index.html')
