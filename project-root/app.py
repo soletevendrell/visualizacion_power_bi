@@ -76,6 +76,10 @@ def process_and_upload_to_sqlite(filepath):
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/tables')
 def list_tables():
     try:
