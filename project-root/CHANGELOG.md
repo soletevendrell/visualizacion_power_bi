@@ -1,6 +1,11 @@
 #Changelog
 
 
+##[6.1.0] - 2024-12-02
+### Added
+- Rediseño de la página de inicio (index.html)
+- Rediseño del pop-up para la eliminación de tablas de la bd
+
 ##[6.0.0] - 2024-11-30
 ### Added
 - Añadida nueva funcionalidad de eliminar archivos de la base de datos

@@ -37,15 +37,12 @@ def upload_file():
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
                 process_and_upload_to_sqlite(filepath)
-        return redirect(url_for('index'))
+        return redirect(url_for('list_tables'))
     return render_template('upload.html')
 
 def process_and_upload_to_sqlite(filepath):
-    """
-    Procesa el archivo subido y lo carga en SQLite.
-    """
     try:
-        # Leer el archivo
+        # leemos el archivo que puede ser tipo csv o excel
         if filepath.endswith('.csv'):
             data = pd.read_csv(filepath)
         elif filepath.endswith(('.xls', '.xlsx')):
@@ -54,15 +51,15 @@ def process_and_upload_to_sqlite(filepath):
             print(f"Formato no soportado: {filepath}")
             return
 
-        # Conectar a SQLite
+        # conecto a SQLite
         conn = sqlite3.connect(DATABASE_PATH)
         table_name = os.path.splitext(os.path.basename(filepath))[0]
 
         print(f"Creando tabla: {table_name}")
-        # Guardar los datos en SQLite
+        # guardo los datos en SQLite
         data.to_sql(table_name, conn, if_exists='replace', index=False)
         
-        # Verificar tablas existentes
+        # verifico las tablas existentes
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         tables = cursor.fetchall()
@@ -71,18 +68,26 @@ def process_and_upload_to_sqlite(filepath):
         conn.close()
         print(f"Datos cargados en SQLite desde {filepath}")
 
-#        if filepath.endswith('.csv'):
-#            data = pd.read_csv(filepath)
-#        elif filepath.endswith(('.xls', '.xlsx')):
-#            data = pd.read_excel(filepath)
-#        else:
-#            print(f"Formato no soportado: {filepath}")
-#            return
-
         print(f"Vista previa de los datos:\n{data.head()}")
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
 
+@app.route('/validate_sample', methods=['POST'])
+def validate_sample():
+    try:
+        #obtenemos los datos del formulario
+        population = int(request.form['population'])
+        #sample_size = int(request.form['sample_size'])
+
+        #CALCULO VALIDEZ MUESTRA ??
+        if (population*(1.64485**2)*0.5*0.5)/(((population-1)*(0.1**2))+((1.64485**2)*0.5*0.5))>10:
+            result = "La muestra es válida para representar a la población."
+        else:
+            result = "La muestra no es válida, debe ser XXXXXXXXXXXX"
+
+        return render_template('upload.html', validation_result=result)
+    except ValueError:
+        return render_template('upload.html', validation_result="Por favor, introduzca valores numéricos válidos.")
 
 @app.route('/tables')
 def list_tables():
@@ -113,7 +118,7 @@ def delete_table(table_name):
         conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
         
-        # Ejecutar el comando para eliminar la tabla
+        # elimino la tabla
         cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
         conn.commit()
         conn.close()
