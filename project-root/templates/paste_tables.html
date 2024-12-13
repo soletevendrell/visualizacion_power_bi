@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pegar Datos</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/excel_paste.js"></script>
+
+</head>
+<body>
+    <header>
+        <h1>Pegar Datos desde Excel</h1>
+    </header>
+    <main>
+        <section class="paste-section">
+            <p>Copie un conjunto de celdas desde Excel y péguelo en el área a continuación:</p>
+            <textarea id="excelData" placeholder="Pegue aquí los datos copiados desde Excel"></textarea>
+            <button onclick="processExcelData()">Procesar Datos</button>
+        </section>
+        <section class="preview-section">
+            <h2>Vista Previa de los Datos</h2>
+            <div id="tablePreview"></div>
+            <button onclick="saveTable()">Guardar en la Base de Datos</button>
+        </section>
+    </main>
+    <script src="/static/js/excel_paste.js"></script>
+</body>
+</html>

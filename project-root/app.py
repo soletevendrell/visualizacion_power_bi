@@ -1,3 +1,5 @@
+import csv
+import uuid
 from flask import Flask, render_template, request, redirect, url_for
 import os
 import pandas as pd
@@ -89,17 +91,18 @@ def validate_sample():
     except ValueError:
         return render_template('upload.html', validation_result="Por favor, introduzca valores numéricos válidos.")
 
+
 @app.route('/tables')
 def list_tables():
     try:
-        conn = sqlite3.connect(DATABASE_PATH)
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = [row[0] for row in cursor.fetchall()]
-        conn.close()
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            tables = [row[0] for row in cursor.fetchall()]
         return render_template('tables.html', tables=tables)
     except Exception as e:
         return f"Error al listar tablas: {e}"
+
 
 @app.route('/table/<table_name>')
 def show_table(table_name):
@@ -114,18 +117,19 @@ def show_table(table_name):
 @app.route('/delete_table/<table_name>', methods=['POST'])
 def delete_table(table_name):
     try:
+        # Validar el nombre de la tabla
+        if not table_name.isidentifier():
+            return f"Nombre de tabla no válido: {table_name}", 400
+
         # Conectar a la base de datos
-        conn = sqlite3.connect(DATABASE_PATH)
-        cursor = conn.cursor()
-        
-        # elimino la tabla
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
-        conn.commit()
-        conn.close()
-        
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+            conn.commit()
+
         return redirect(url_for('list_tables'))  # Redirige a la lista de tablas
     except Exception as e:
-        return f"Error al eliminar la tabla {table_name}: {e}"
+        return f"Error al eliminar la tabla {table_name}: {e}", 500
 
 
 @app.route('/join_tables', methods=['GET', 'POST'])
@@ -160,6 +164,48 @@ def join_tables():
         columns[table] = [col[1] for col in cursor.fetchall()]
     conn.close()
     return render_template('join_tables.html', tables=tables, columns=columns)
+
+@app.route('/paste_tables', methods=['GET'])
+def paste_tables():
+    return render_template('paste_tables.html')
+
+@app.route('/save_pasted_data', methods=['POST'])
+def save_pasted_data():
+    try:
+        data = request.json.get('data', '')
+
+        if not data:
+            return "Error: No se recibieron datos", 400
+
+        # Procesar filas y columnas
+        rows = [row.split('\t') for row in data.split('\n') if row.strip()]
+
+        # Validar datos
+        if not rows or len(set(len(row) for row in rows)) > 1:
+            return "Error: Datos inválidos o inconsistencia en columnas", 400
+
+        # Guardar en CSV
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'pasted_data.csv')
+        with open(filepath, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerows(rows)
+
+        # Guardar en SQLite
+        conn = sqlite3.connect(DATABASE_PATH)
+        table_name = f"tabla_{uuid.uuid4().hex[:8]}"  # Nombre único
+        df = pd.DataFrame(rows[1:], columns=rows[0])
+        df.to_sql(table_name, conn, if_exists='replace', index=False)
+        conn.close()
+
+        return f"Datos guardados correctamente en la tabla '{table_name}' con {len(df)} filas.", 200
+    except ValueError as ve:
+        return f"Error de validación: {ve}", 400
+    except sqlite3.Error as sqle:
+        return f"Error de base de datos: {sqle}", 500
+    except Exception as e:
+        return f"Error inesperado: {e}", 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

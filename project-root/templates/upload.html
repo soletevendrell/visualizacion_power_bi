@@ -11,7 +11,9 @@
         <h1>SUBIDA DE ARCHIVOS</h1>
     </header>
     <main>
+        
         <section class="upload-section">
+            <a href="{{ url_for('paste_tables') }}">Ir a Pegar Datos</a>
             <h2>Suba aquí sus archivos</h2>
             <p>Suba un archivo en formato CSV o Excel para procesarlo y almacenarlo en la base de datos:</p>
             <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-form">

@@ -1,6 +1,16 @@
 #Changelog
 
 
+##[7.0.0] - 2024-12-13
+### Added
+- Añadida nueva funcionalidad para poder pegar los datos de una tabla y crear un csv que se guarde en la bd
+- Arreglos de pequeños errores
+
+##[6.2.0] - 2024-12-04
+### Fixed
+- Mensaje del archivo seleccionado para la subida
+- Cambios de diseño en upload.html
+
 ##[6.1.0] - 2024-12-02
 ### Added
 - Rediseño de la página de inicio (index.html)
