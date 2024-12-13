@@ -164,6 +164,38 @@ def join_tables():
         columns[table] = [col[1] for col in cursor.fetchall()]
     conn.close()
     return render_template('join_tables.html', tables=tables, columns=columns)
+"""
+def fill_combined_cells(rows):
+
+    #Detecta y rellena celdas combinadas en una tabla.
+    #Las celdas vacías en una fila heredan el valor más cercano hacia la izquierda.
+    #Las celdas vacías en una columna heredan el valor más cercano hacia arriba.
+    # Rellenar horizontalmente (izquierda -> derecha)
+    for row in rows:
+        for i in range(1, len(row)):
+            if not row[i].strip():  # Si la celda está vacía
+                row[i] = row[i - 1]  # Rellena con el valor de la izquierda
+
+    # Transponer filas para trabajar verticalmente (columnas)
+    columns = list(zip(*rows))
+
+    # Rellenar verticalmente (arriba -> abajo)
+    filled_columns = []
+    for column in columns:
+        filled_column = []
+        for i in range(len(column)):
+            if column[i].strip():  # Si la celda tiene valor
+                filled_column.append(column[i])
+            elif i > 0:  # Si está vacía, toma el valor superior
+                filled_column.append(filled_column[-1])
+            else:  # Si es la primera celda y está vacía
+                filled_column.append("")
+        filled_columns.append(filled_column)
+
+    # Volver a transponer para devolver las filas al formato original
+    filled_rows = list(map(list, zip(*filled_columns)))
+    return filled_rows
+"""
 
 @app.route('/paste_tables', methods=['GET'])
 def paste_tables():
@@ -173,38 +205,56 @@ def paste_tables():
 def save_pasted_data():
     try:
         data = request.json.get('data', '')
+        table_name = request.json.get('tableName', '').strip()
 
         if not data:
             return "Error: No se recibieron datos", 400
 
+        if not table_name:
+            return "Error: No se proporcionó un nombre para la tabla", 400
+
+        # Validar el nombre de la tabla
+        if not table_name.isidentifier():
+            return "Error: El nombre de la tabla contiene caracteres no válidos", 400
+
         # Procesar filas y columnas
         rows = [row.split('\t') for row in data.split('\n') if row.strip()]
+        print(f"Filas originales: {rows}")
 
-        # Validar datos
-        if not rows or len(set(len(row) for row in rows)) > 1:
-            return "Error: Datos inválidos o inconsistencia en columnas", 400
+        # Rellenar celdas combinadas
+        #rows = fill_combined_cells(rows)
+        print(f"Filas procesadas tras rellenar celdas combinadas: {rows}")
+
+        # Validar consistencia de columnas
+        max_columns = max(len(row) for row in rows)
+        rows = [row + [""] * (max_columns - len(row)) for row in rows]
+
+        # Sanitizar encabezados
+        headers = rows[0]
+        if not all(header.strip() for header in headers):
+            headers = [f"Columna_{i+1}" for i in range(max_columns)]
+            rows.insert(0, headers)
+        else:
+            headers = [col.strip().replace(" ", "_").replace("-", "_") for col in headers]
+
+        print(f"Encabezados: {headers}")
+
+        # Crear DataFrame
+        df = pd.DataFrame(rows[1:], columns=headers)
+        print(f"DataFrame creado:\n{df.head()}")
 
         # Guardar en CSV
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'pasted_data.csv')
-        with open(filepath, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerows(rows)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{table_name}.csv")
+        df.to_csv(filepath, index=False, encoding='utf-8')
+        print(f"Archivo CSV guardado correctamente en: {filepath}")
 
         # Guardar en SQLite
-        conn = sqlite3.connect(DATABASE_PATH)
-        table_name = f"tabla_{uuid.uuid4().hex[:8]}"  # Nombre único
-        df = pd.DataFrame(rows[1:], columns=rows[0])
-        df.to_sql(table_name, conn, if_exists='replace', index=False)
-        conn.close()
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            df.to_sql(table_name, conn, if_exists='replace', index=False)
 
         return f"Datos guardados correctamente en la tabla '{table_name}' con {len(df)} filas.", 200
-    except ValueError as ve:
-        return f"Error de validación: {ve}", 400
-    except sqlite3.Error as sqle:
-        return f"Error de base de datos: {sqle}", 500
     except Exception as e:
-        return f"Error inesperado: {e}", 500
-
+        return f"Error al guardar los datos: {e}", 500
 
 
 if __name__ == '__main__':

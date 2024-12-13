@@ -28,28 +28,32 @@ function processExcelData() {
 
 function saveTable() {
     const rawData = document.getElementById('excelData').value;
+    const tableName = document.getElementById('tableName').value;
 
     if (!rawData.trim()) {
         alert('Por favor, pegue datos válidos desde Excel.');
         return;
     }
 
-    // Enviar los datos al backend
+    if (!tableName.trim()) {
+        alert('Por favor, ingrese un nombre para la tabla.');
+        return;
+    }
+
+    // Enviar los datos y el nombre de la tabla al backend
     fetch('/save_pasted_data', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: rawData }),
+        body: JSON.stringify({ data: rawData, tableName: tableName }),
     })
         .then(response => {
             if (response.ok) {
-                return response.text(); // Leer el mensaje del servidor
+                alert('Datos guardados correctamente en la base de datos.');
             } else {
-                throw new Error('Error al guardar los datos.');
+                alert('Error al guardar los datos.');
             }
         })
-        .then(message => alert(message))
         .catch(error => console.error('Error:', error));
 }
-
