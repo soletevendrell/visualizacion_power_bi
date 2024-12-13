@@ -3,48 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE VISUALIZACIÓN DE DATOS</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Subida de Archivos</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/upload.css">
 </head>
 <body>
-    <header class="page-header">
-        <h1>SUBIDA DE ARCHIVOS</h1>
+    <header>
+        <h1>SUBIDA DE DATOS</h1>
     </header>
     <main>
-        
-        <section class="upload-section">
-            <a href="{{ url_for('paste_tables') }}">Ir a Pegar Datos</a>
-            <h2>Suba aquí sus archivos</h2>
-            <p>Suba un archivo en formato CSV o Excel para procesarlo y almacenarlo en la base de datos:</p>
-            <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-form">
-                <label for="file-upload" class="file-upload-label">
-                    <span>Seleccionar Archivos</span>
-                    <input type="file" name="files[]" id="file-upload" multiple onchange="updateFileName()">
-                </label>
-                <p id="file-name-display" class="file-name-display">Ningún archivo seleccionado</p>
-                <button type="submit" class="upload-button">Subir</button>
-            </form>
-            <script>
-                function updateFileName() {
-                    const fileInput = document.getElementById('file-upload');
-                    const fileNameDisplay = document.getElementById('file-name-display');
-            
-                    if (fileInput.files.length > 0) {
-                        const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
-                        fileNameDisplay.textContent = `Archivo seleccionado: ${fileNames}`;
-                    } else {
-                        fileNameDisplay.textContent = 'Ningún archivo seleccionado';
-                    }
-                }
-            </script>
-        </section>
+        <!-- Opciones de Subida -->
+        <div class="upload-container">
+            <!-- Subir Archivo -->
+            <div class="upload-option">
+                <h2>Subir Archivos</h2>
+                <p>Suba un archivo en formato CSV o Excel:</p>
+                <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+                    <label for="file-upload" class="file-upload-label">
+                        <span>Seleccionar Archivos</span>
+                        <input type="file" name="files[]" id="file-upload" multiple onchange="updateFileName()">
+                    </label>
+                    <p id="file-name-display" class="file-name-display">Ningún archivo seleccionado</p>
+                    <button type="submit" class="upload-button">Subir</button>
+                </form>
+            </div>
 
+            <!-- Pegar Datos -->
+            <div class="upload-option">
+                <h2>Pegar Datos</h2>
+                <p>Pegue datos directamente desde Excel:</p>
+                <a href="{{ url_for('paste_tables') }}" class="paste-button">Ir a Pegar Datos</a>
+            </div>
+        </div>
+
+        <!-- Validación de Muestra -->
         <section class="validate-section">
-            <h2>Valide su muestra</h2>
-            <p>Introduzca la población total para garantizar una representación adecuada:</p>
+            <h2>Validar Muestra</h2>
+            <p>Introduzca los valores para la población y el tamaño de la muestra:</p>
             <form action="/validate_sample" method="POST" class="validate-form">
-                <input type="number" name="population" placeholder="Población total" required>
-                <button type="submit" class="validate-button">Calcular validez</button>
+                <input type="number" name="population" placeholder="Población" required>
+                <input type="number" name="sample_size" placeholder="Muestra" required>
+                <button type="submit" class="validate-button">Calcular</button>
             </form>
             {% if validation_result %}
                 <div class="validation-result">
@@ -53,9 +52,23 @@
             {% endif %}
         </section>
 
+        <!-- Enlace para volver -->
         <div class="back-link">
             <a href="{{ url_for('index') }}">Volver a Inicio</a>
         </div>
     </main>
+    <script>
+        function updateFileName() {
+            const fileInput = document.getElementById('file-upload');
+            const fileNameDisplay = document.getElementById('file-name-display');
+    
+            if (fileInput.files.length > 0) {
+                const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
+                fileNameDisplay.textContent = `Archivo seleccionado: ${fileNames}`;
+            } else {
+                fileNameDisplay.textContent = 'Ningún archivo seleccionado';
+            }
+        }
+    </script>
 </body>
 </html>

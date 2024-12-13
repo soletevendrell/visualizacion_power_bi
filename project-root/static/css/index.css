@@ -1,0 +1,74 @@
+/* index.css */
+
+/* Contenedor de las cajas */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas iguales */
+    gap: 20px; /* Espacio entre las cajas */
+    padding: 20px;
+}
+
+/* Cajas individuales */
+.grid-item {
+    position: relative;
+    background-color: #f4f4f4; /* Color claro para visibilidad */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 200px; /* Altura fija */
+    display: flex; /* Flexbox para centrar contenido */
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    filter: blur(1px); /* Efecto de desenfoque inicial */
+}
+
+/* Al pasar el cursor por encima */
+.grid-item:hover {
+    transform: translateY(-5px); /* Mueve ligeramente hacia arriba */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Sombra para profundidad */
+    filter: blur(0); /* Elimina el desenfoque */
+}
+
+/* Superposición de texto */
+.grid-item .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex; /* Flexbox para centrar contenido */
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    color: white; /* Texto blanco */
+    font-size: 1.5rem;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Mejora visibilidad del texto */
+    opacity: 0; /* Invisible inicialmente */
+    transition: opacity 0.3s ease;
+}
+
+/* Al pasar el cursor, muestra el texto */
+.grid-item:hover .overlay {
+    opacity: 1;
+}
+
+/* Ajusta las imágenes de fondo para cada botón */
+.grid-item.upload {
+    background-image: url('/static/images/upload_archivos.png');
+    background-size: cover; /* Imagen se adapta al contenedor */
+    background-position: center;
+}
+
+.grid-item.tables {
+    background-image: url('/static/images/visualizar_archivos.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.grid-item.join {
+    background-image: url('/static/images/join_archivos.png');
+    background-size: cover;
+    background-position: center;
+}

@@ -1,6 +1,16 @@
 #Changelog
 
 
+
+##[7.1.1] - 2024-12-13
+### Fixed
+- Rediseño de la página de inicio
+- Rediseño de la pa´gina desde la que se suben las tablas
+
+##[7.1.0] - 2024-12-13
+### Fixed
+- Corrección en la subida de las tablas pegadas desde excel
+
 ##[7.0.0] - 2024-12-13
 ### Added
 - Añadida nueva funcionalidad para poder pegar los datos de una tabla y crear un csv que se guarde en la bd

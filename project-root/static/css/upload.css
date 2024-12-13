@@ -1,0 +1,105 @@
+/* Sección principal */
+.upload-container {
+    display: flex;
+    justify-content: space-around; /* Divide las opciones en columnas */
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.upload-option {
+    width: 45%; /* Cada opción ocupa el 45% del contenedor */
+    text-align: center;
+}
+
+.upload-option h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: #003366;
+}
+
+.upload-option p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+.file-upload-label, .paste-button {
+    display: inline-block;
+    background-color: #2a6fb4c5;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.file-upload-label:hover, .paste-button:hover {
+    background-color: #336699;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.file-name-display {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #333;
+    font-style: italic;
+}
+
+/* Validación de muestra */
+.validate-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.validate-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: #003366;
+}
+
+.validate-form {
+    display: flex;
+    justify-content: center; /* Alinea los campos horizontalmente */
+    gap: 10px; /* Espacio entre las cajas */
+}
+
+.validate-form input[type="number"] {
+    width: 120px; /* Más pequeño porque solo se introduce un número */
+    padding: 0.5rem;
+    margin-bottom: 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    text-align: center; /* Centra el texto dentro de la caja */
+}
+
+.validate-button {
+    background-color: #2a6fb4c5;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.validate-button:hover {
+    background-color: #022b54;
+}
