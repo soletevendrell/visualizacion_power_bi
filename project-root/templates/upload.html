@@ -6,6 +6,7 @@
     <title>Subida de Archivos</title>
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/upload.css">
+    <script src="/static/js/upload.js" defer></script>
 </head>
 <body>
     <header>
@@ -21,7 +22,7 @@
                 <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-form">
                     <label for="file-upload" class="file-upload-label">
                         <span>Seleccionar Archivos</span>
-                        <input type="file" name="files[]" id="file-upload" multiple onchange="updateFileName()">
+                        <input type="file" name="files[]" id="file-upload" multiple>
                     </label>
                     <p id="file-name-display" class="file-name-display">Ningún archivo seleccionado</p>
                     <button type="submit" class="upload-button">Subir</button>
@@ -57,18 +58,5 @@
             <a href="{{ url_for('index') }}">Volver a Inicio</a>
         </div>
     </main>
-    <script>
-        function updateFileName() {
-            const fileInput = document.getElementById('file-upload');
-            const fileNameDisplay = document.getElementById('file-name-display');
-    
-            if (fileInput.files.length > 0) {
-                const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
-                fileNameDisplay.textContent = `Archivo seleccionado: ${fileNames}`;
-            } else {
-                fileNameDisplay.textContent = 'Ningún archivo seleccionado';
-            }
-        }
-    </script>
 </body>
 </html>

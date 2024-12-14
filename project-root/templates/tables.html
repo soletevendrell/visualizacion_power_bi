@@ -3,51 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE VISUALIZACIÓN DE DATOS</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Tablas en la Base de Datos</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/tables.css">
+    <script src="/static/js/tables.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>Tablas en la Base de Datos</h1>
+        <h1>TABLAS EXISTENTES EN LA BASE DE DATOS</h1>
     </header>
-    <main>
-        <p>Explore las tablas ya subidas y procesadas en la base de datos</p>
+    <main class="main-container">
+        <p>Explore las tablas ya subidas y procesadas en la base de datos:</p>
 
-        <ul>
+        <ul class="table-list">
             {% for table in tables %}
-                <li><a href="/table/{{ table }}">{{ table }}</a></li>
-                <button onclick="showPopup('{{ table }}')">Eliminar</button>
+                <li>
+                    <a href="/table/{{ table }}">{{ table }}</a>
+                    <i class="fas fa-trash delete-icon" onclick="showPopup('{{ table }}')" title="Eliminar"></i>
+                </li>
             {% endfor %}
         </ul>
-        {{ data|safe }}
-        <a href="{{ url_for('index') }}">Volver al Inicio</a>
-        <a href="{{ url_for('join_tables') }}">Relacionar tablas</a>
-    </main>
 
-    <!-- Pop-Up Personalizado -->
-    <div id="deletePopup" class="popup hidden">
-        <div class="popup-content">
-            <h2>Confirmación de Eliminación de la tabla</h2>
-            <p>¿Está seguro de que quiere eliminar la tabla "<span id="tableName"></span>" de la base de datos?</p>
-            <form id="deleteForm" method="POST">
-                <button type="submit" class="confirm">Confirmar</button>
-                <button type="button" class="cancel" onclick="closePopup()">Cancelar</button>
-            </form>
+        <!-- Pop-Up para Confirmación -->
+        <div id="deletePopup" class="popup">
+            <div class="popup-content">
+                <h2>Confirmación de Eliminación</h2>
+                <p>¿Está seguro de que quiere eliminar la tabla "<span id="tableName"></span>"?</p>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="confirm">Confirmar</button>
+                    <button type="button" class="cancel" onclick="closePopup()">Cancelar</button>
+                </form>
+            </div>
         </div>
-    </div>
-    <script>
-        // Mostrar el pop-up
-        function showPopup(tableName) {
-            document.getElementById('tableName').textContent = tableName;
-            const deleteForm = document.getElementById('deleteForm');
-            deleteForm.action = `/delete_table/${encodeURIComponent(tableName)}`;
-            document.getElementById('deletePopup').classList.remove('hidden');
-        }
 
-        // Cerrar el pop-up
-        function closePopup() {
-            document.getElementById('deletePopup').classList.add('hidden');
-        }
-    </script>
+        <!-- Botón Volver a inicio-->
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">Volver a Inicio</a>
+        </div>
+    </main>
 </body>
 </html>
