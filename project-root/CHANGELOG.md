@@ -1,6 +1,31 @@
 #Changelog
 
 
+
+##[7.1.1] - 2024-12-13
+### Fixed
+- Rediseño de la página de inicio
+- Rediseño de la pa´gina desde la que se suben las tablas
+
+##[7.1.0] - 2024-12-13
+### Fixed
+- Corrección en la subida de las tablas pegadas desde excel
+
+##[7.0.0] - 2024-12-13
+### Added
+- Añadida nueva funcionalidad para poder pegar los datos de una tabla y crear un csv que se guarde en la bd
+- Arreglos de pequeños errores
+
+##[6.2.0] - 2024-12-04
+### Fixed
+- Mensaje del archivo seleccionado para la subida
+- Cambios de diseño en upload.html
+
+##[6.1.0] - 2024-12-02
+### Added
+- Rediseño de la página de inicio (index.html)
+- Rediseño del pop-up para la eliminación de tablas de la bd
+
 ##[6.0.0] - 2024-11-30
 ### Added
 - Añadida nueva funcionalidad de eliminar archivos de la base de datos

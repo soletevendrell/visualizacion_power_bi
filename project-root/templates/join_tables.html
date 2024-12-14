@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SISTEMA DE VISUALIZACIÓN DE DATOS</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/join_tables.js"></script>
 </head>
 <body>
     <header>
@@ -45,6 +46,6 @@
     <main>
         {{ data|safe }}
         <a href="{{ url_for('index') }}">Volver al Inicio</a>
-    </main>
+    </main>  
 </body>
 </html>
