@@ -1,6 +1,28 @@
 #Changelog
 
 
+##[8.2.1] - 2024-12-15
+### Fixed
+- Eliminación de un método en app.py innnecesario que generaba error
+
+##[8.2.0] - 2024-12-15
+### Fixed
+- Arreglo "parcial" del pegado de datos desde excel (paste_tables)
+
+##[8.1.0] - 2024-12-15
+### Fixed
+- Arreglo de la subida de archivos
+
+##[8.0.1] - 2024-12-14
+### Fixed
+- Pequeño ajuste en la tabla en la vista previa de los datos al pegar desde excel
+- Botón reorganizado para guardar la tabla en la bd
+
+##[8.0.0] - 2024-12-14
+### Fixed
+- Rediseño de muchas páginas para que se mantenga una misma estructura
+### Added
+- Creación de javascripts y archivos css para cada página para poder tener todo más organizado
 
 ##[7.1.1] - 2024-12-13
 ### Fixed

@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import sqlite3
 from werkzeug.utils import secure_filename
+from openpyxl import load_workbook
 
 app = Flask(__name__)
 
@@ -22,10 +23,7 @@ def index():
     return render_template('index.html')
 
 def allowed_file(filename):
-    """
-    Verifica si un archivo tiene una extensión permitida.
-    """
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'xls', 'xlsx', 'csv'}
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
@@ -41,6 +39,7 @@ def upload_file():
                 process_and_upload_to_sqlite(filepath)
         return redirect(url_for('list_tables'))
     return render_template('upload.html')
+
 
 def process_and_upload_to_sqlite(filepath):
     try:
@@ -74,6 +73,7 @@ def process_and_upload_to_sqlite(filepath):
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
 
+
 @app.route('/validate_sample', methods=['POST'])
 def validate_sample():
     try:
@@ -99,10 +99,11 @@ def list_tables():
             cursor = conn.cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
             tables = [row[0] for row in cursor.fetchall()]
+            print(f"Tablas en la base de datos: {tables}")
         return render_template('tables.html', tables=tables)
     except Exception as e:
         return f"Error al listar tablas: {e}"
-
+list_tables()
 
 @app.route('/table/<table_name>')
 def show_table(table_name):
@@ -164,7 +165,7 @@ def join_tables():
         columns[table] = [col[1] for col in cursor.fetchall()]
     conn.close()
     return render_template('join_tables.html', tables=tables, columns=columns)
-"""
+
 def fill_combined_cells(rows):
 
     #Detecta y rellena celdas combinadas en una tabla.
@@ -173,8 +174,8 @@ def fill_combined_cells(rows):
     # Rellenar horizontalmente (izquierda -> derecha)
     for row in rows:
         for i in range(1, len(row)):
-            if not row[i].strip():  # Si la celda está vacía
-                row[i] = row[i - 1]  # Rellena con el valor de la izquierda
+            if row[i] is None or (isinstance(row[i], str) and not row[i].strip()):
+                row[i] = row[i - 1]
 
     # Transponer filas para trabajar verticalmente (columnas)
     columns = list(zip(*rows))
@@ -195,20 +196,22 @@ def fill_combined_cells(rows):
     # Volver a transponer para devolver las filas al formato original
     filled_rows = list(map(list, zip(*filled_columns)))
     return filled_rows
-"""
+
 
 @app.route('/paste_tables', methods=['GET'])
 def paste_tables():
     return render_template('paste_tables.html')
 
+"""
 @app.route('/save_pasted_data', methods=['POST'])
 def save_pasted_data():
     try:
         data = request.json.get('data', '')
         table_name = request.json.get('tableName', '').strip()
 
-        if not data:
-            return "Error: No se recibieron datos", 400
+        if not data or not all(isinstance(row, (list, tuple)) for row in data):
+            print(f"Error: Los datos en {table_name} no son válidos.")
+            return
 
         if not table_name:
             return "Error: No se proporcionó un nombre para la tabla", 400
@@ -220,9 +223,10 @@ def save_pasted_data():
         # Procesar filas y columnas
         rows = [row.split('\t') for row in data.split('\n') if row.strip()]
         print(f"Filas originales: {rows}")
-
-        # Rellenar celdas combinadas
-        #rows = fill_combined_cells(rows)
+        #rows = [row.split('\t') for row in data.split('\n') if row.strip()]
+        #rows = [[cell.strip() if isinstance(cell, str) else cell for cell in row] for row in rows]
+        
+        rows = fill_combined_cells(rows)
         print(f"Filas procesadas tras rellenar celdas combinadas: {rows}")
 
         # Validar consistencia de columnas
@@ -256,6 +260,91 @@ def save_pasted_data():
     except Exception as e:
         return f"Error al guardar los datos: {e}", 500
 
+def extract_tables_with_merged_cells(filepath):
+    workbook = load_workbook(filepath)
+    tables = []
+
+    for sheet_name in workbook.sheetnames:
+        sheet = workbook[sheet_name]
+
+        # Extraer datos de la hoja
+        table_data = []
+        for row in sheet.iter_rows(values_only=True):
+            # Manejar celdas basadas en su tipo
+            row_data = [(str(cell).strip() if isinstance(cell, str) else cell) for cell in row]
+            table_data.append(row_data)
+
+        # Debugging para verificar las primeras filas
+        print(f"Datos extraídos de la hoja '{sheet_name}': {table_data[:5]}")
+
+        # Procesar celdas combinadas (si aplica)
+        table_data = fill_combined_cells(table_data)
+
+        tables.append({
+            "sheet_name": sheet_name,
+            "data": table_data
+        })
+
+    return tables
+"""
+@app.route('/save_pasted_data', methods=['POST'])
+def save_pasted_data():
+    try:
+        # Obtener datos del cliente
+        data = request.json.get('data', '').strip()
+        table_name = request.json.get('tableName', '').strip()
+
+        if not data or not table_name:
+            return "Error: Datos o nombre de tabla no proporcionados", 400
+
+        # Validar el nombre de la tabla
+        if not table_name.isidentifier():
+            return "Error: El nombre de la tabla contiene caracteres no válidos", 400
+
+        # Procesar filas y columnas
+        rows = [row.split('\t') for row in data.split('\n') if row.strip()]
+        if not rows:
+            return "Error: Los datos están vacíos o mal formateados", 400
+
+        # Validar consistencia de columnas
+        max_columns = max(len(row) for row in rows)
+        rows = [row + [""] * (max_columns - len(row)) for row in rows]
+
+        # Sanitizar encabezados
+        headers = rows[0]
+        if not all(isinstance(header, str) and header.strip() for header in headers):
+            headers = [f"Columna_{i+1}" for i in range(max_columns)]
+
+        # Crear DataFrame
+        df = pd.DataFrame(rows[1:], columns=headers)
+        print(f"DataFrame creado:\n{df.head()}")
+
+        # Guardar en SQLite
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            df.to_sql(table_name, conn, if_exists='replace', index=False)
+
+        return f"Datos guardados correctamente en la tabla '{table_name}' con {len(df)} filas.", 200
+    except Exception as e:
+        print(f"Error al guardar los datos: {e}")
+        return f"Error al guardar los datos: {e}", 500
+
+"""
+@app.route('/upload_excel', methods=['GET', 'POST'])
+def upload_excel():
+    if request.method == 'POST':
+        # Guardar el archivo temporalmente
+        file = request.files['file']
+        file_path = f"/tmp/{file.filename}"
+        file.save(file_path)
+
+        # Procesar el archivo subido
+        #tables = extract_tables_with_merged_cells(file_path)
+
+        # Renderizar una vista previa
+        return render_template('tables_preview.html', tables=tables)
+
+    return render_template('upload_excel.html')
+"""
 
 if __name__ == '__main__':
     app.run(debug=True)

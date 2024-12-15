@@ -81,8 +81,35 @@ button:hover {
     color: #003366;
 }
 
+#tablePreview {
+    display: inline-block;
+    margin: 0 auto;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+/* estilos para la tabla */
+#tablePreview table {
+    border-collapse: collapse;
+    width: auto; /* Ajusta al contenido */
+    max-width: 100%;
+}
+
+#tablePreview th, #tablePreview td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+#tablePreview th {
+    background-color: #2a6fb4c5; /* color de fondo para la cabecera */
+    color: white;
+    font-weight: bold;
+}
+
 /* Botón de guardar */
 button.save-button {
+    margin-top: 20px;
     background-color: #2a6fb4c5;
     color: white;
     border: none;
