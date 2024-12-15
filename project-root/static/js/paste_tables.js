@@ -8,9 +8,17 @@ function processExcelData() {
 
     // Parsear los datos pegados como filas y columnas
     const rows = rawData.split('\n').map(row => row.split('\t'));
+    const maxColumns = Math.max(...rows.map(row => row.length));
+    rows.forEach(row => {
+        while (row.length < maxColumns) {
+            row.push('');
+        }
+    });
+
+
     const table = document.createElement('table');
     table.border = '1';
-
+ 
     rows.forEach(row => {
         const tr = document.createElement('tr');
         row.forEach(cell => {
@@ -20,7 +28,7 @@ function processExcelData() {
         });
         table.appendChild(tr);
     });
-
+    
     // Mostrar la tabla en la vista previa
     document.getElementById('tablePreview').innerHTML = '';
     document.getElementById('tablePreview').appendChild(table);
