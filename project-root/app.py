@@ -202,6 +202,7 @@ def fill_combined_cells(rows):
 def paste_tables():
     return render_template('paste_tables.html')
 
+"""
 @app.route('/save_pasted_data', methods=['POST'])
 def save_pasted_data():
     try:
@@ -285,6 +286,48 @@ def extract_tables_with_merged_cells(filepath):
         })
 
     return tables
+"""
+@app.route('/save_pasted_data', methods=['POST'])
+def save_pasted_data():
+    try:
+        # Obtener datos del cliente
+        data = request.json.get('data', '').strip()
+        table_name = request.json.get('tableName', '').strip()
+
+        if not data or not table_name:
+            return "Error: Datos o nombre de tabla no proporcionados", 400
+
+        # Validar el nombre de la tabla
+        if not table_name.isidentifier():
+            return "Error: El nombre de la tabla contiene caracteres no válidos", 400
+
+        # Procesar filas y columnas
+        rows = [row.split('\t') for row in data.split('\n') if row.strip()]
+        if not rows:
+            return "Error: Los datos están vacíos o mal formateados", 400
+
+        # Validar consistencia de columnas
+        max_columns = max(len(row) for row in rows)
+        rows = [row + [""] * (max_columns - len(row)) for row in rows]
+
+        # Sanitizar encabezados
+        headers = rows[0]
+        if not all(isinstance(header, str) and header.strip() for header in headers):
+            headers = [f"Columna_{i+1}" for i in range(max_columns)]
+
+        # Crear DataFrame
+        df = pd.DataFrame(rows[1:], columns=headers)
+        print(f"DataFrame creado:\n{df.head()}")
+
+        # Guardar en SQLite
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            df.to_sql(table_name, conn, if_exists='replace', index=False)
+
+        return f"Datos guardados correctamente en la tabla '{table_name}' con {len(df)} filas.", 200
+    except Exception as e:
+        print(f"Error al guardar los datos: {e}")
+        return f"Error al guardar los datos: {e}", 500
+
 
 @app.route('/upload_excel', methods=['GET', 'POST'])
 def upload_excel():

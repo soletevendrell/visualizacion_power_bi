@@ -35,16 +35,22 @@ function processExcelData() {
 }
 
 function saveTable() {
-    const rawData = document.getElementById('excelData').value;
-    const tableName = document.getElementById('tableName').value;
+    const rawData = document.getElementById('excelData').value.trim();
+    const tableName = document.getElementById('tableName').value.trim();
 
-    if (!rawData.trim()) {
+    if (!rawData) {
         alert('Por favor, pegue datos válidos desde Excel.');
         return;
     }
 
-    if (!tableName.trim()) {
+    if (!tableName) {
         alert('Por favor, ingrese un nombre para la tabla.');
+        return;
+    }
+
+    const rows = rawData.split('\n').map(row => row.split('\t'));
+    if (rows.some(row => row.length !== rows[0].length)) {
+        alert('Los datos tienen filas con columnas inconsistentes.');
         return;
     }
 
@@ -60,7 +66,9 @@ function saveTable() {
             if (response.ok) {
                 alert('Datos guardados correctamente en la base de datos.');
             } else {
-                alert('Error al guardar los datos.');
+                return response.text().then(err => {
+                    alert(`Error al guardar los datos: ${err}`);
+                });
             }
         })
         .catch(error => console.error('Error:', error));
