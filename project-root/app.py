@@ -29,72 +29,47 @@ def allowed_file(filename):
 def upload_file():
     if request.method == 'POST':
         if 'files[]' not in request.files:
-            return "No se seleccionaron archivos", 400
-
+            return "No file part"
         files = request.files.getlist('files[]')
         for file in files:
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
-
-                # Procesar el archivo (Excel o CSV)
                 process_and_upload_to_sqlite(filepath)
-                print(f"Archivo guardado en: {filepath}")
         return redirect(url_for('list_tables'))
-    
     return render_template('upload.html')
 
 
 def process_and_upload_to_sqlite(filepath):
     try:
-        if filepath.endswith(('.xls', '.xlsx')):
-            tables = extract_tables_with_merged_cells(filepath)
+        # leemos el archivo que puede ser tipo csv o excel
+        if filepath.endswith('.csv'):
+            data = pd.read_csv(filepath)
+        elif filepath.endswith(('.xls', '.xlsx')):
+            data = pd.read_excel(filepath, engine='openpyxl')
+        else:
+            print(f"Formato no soportado: {filepath}")
+            return
 
-            for table in tables:
-                sheet_name = table["sheet_name"]
-                data = table["data"]
+        # conecto a SQLite
+        conn = sqlite3.connect(DATABASE_PATH)
+        table_name = os.path.splitext(os.path.basename(filepath))[0]
 
-                if not data or len(data) < 2:
-                    print(f"Error: La hoja '{sheet_name}' está vacía o no tiene suficientes filas.")
-                    continue
-            
-                headers = [(str(col).strip() if col is not None else f"Columna_{i+1}")
-                            for i, col in enumerate(data[0])]
+        print(f"Creando tabla: {table_name}")
+        # guardo los datos en SQLite
+        data.to_sql(table_name, conn, if_exists='replace', index=False)
+        
+        # verifico las tablas existentes
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        print(f"Tablas existentes: {tables}")
 
-                if not any(headers):
-                    print(f"Error: La hoja '{sheet_name}' no tiene encabezados válidos.")
-                    continue
+        conn.close()
+        print(f"Datos cargados en SQLite desde {filepath}")
 
-                max_columns = len(headers)
-                filled_data = [
-                    [(cell if cell is not None else None) for cell in row] +
-                    [None] * (max_columns - len(row))
-                    for row in data[1:]
-                ]
-
-                # Crear DataFrame y guardar en SQLite
-                df = pd.DataFrame(filled_data, columns=headers)
-                print(f"Guardando tabla: {sheet_name} con {len(df)} filas y {len(df.columns)} columnas.")
-                with sqlite3.connect(DATABASE_PATH) as conn:
-                    df.to_sql(sheet_name, conn, if_exists="replace", index=False)
-
-        elif filepath.endswith('.csv'):
-            print(f"Procesando archivo CSV: {filepath}")
-            df = pd.read_csv(filepath)
-
-            if df.empty:
-                print("El archivo CSV está vacío.")
-                return
-
-            table_name = os.path.splitext(os.path.basename(filepath))[0]
-            if not table_name.isidentifier():
-                table_name = f"Tabla_{uuid.uuid4().hex[:8]}"
-
-            print(f"Guardando tabla CSV: {table_name}")
-            with sqlite3.connect(DATABASE_PATH) as conn:
-                df.to_sql(table_name, conn, if_exists="replace", index=False)
-
+        print(f"Vista previa de los datos:\n{data.head()}")
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
 
