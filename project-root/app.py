@@ -328,7 +328,7 @@ def save_pasted_data():
         print(f"Error al guardar los datos: {e}")
         return f"Error al guardar los datos: {e}", 500
 
-
+"""
 @app.route('/upload_excel', methods=['GET', 'POST'])
 def upload_excel():
     if request.method == 'POST':
@@ -338,13 +338,13 @@ def upload_excel():
         file.save(file_path)
 
         # Procesar el archivo subido
-        tables = extract_tables_with_merged_cells(file_path)
+        #tables = extract_tables_with_merged_cells(file_path)
 
         # Renderizar una vista previa
         return render_template('tables_preview.html', tables=tables)
 
     return render_template('upload_excel.html')
-
+"""
 
 if __name__ == '__main__':
     app.run(debug=True)
