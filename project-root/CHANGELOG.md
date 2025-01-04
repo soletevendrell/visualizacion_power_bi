@@ -1,6 +1,53 @@
 #Changelog
 
 
+##[8.2.1] - 2024-12-15
+### Fixed
+- Eliminación de un método en app.py innnecesario que generaba error
+
+##[8.2.0] - 2024-12-15
+### Fixed
+- Arreglo "parcial" del pegado de datos desde excel (paste_tables)
+
+##[8.1.0] - 2024-12-15
+### Fixed
+- Arreglo de la subida de archivos
+
+##[8.0.1] - 2024-12-14
+### Fixed
+- Pequeño ajuste en la tabla en la vista previa de los datos al pegar desde excel
+- Botón reorganizado para guardar la tabla en la bd
+
+##[8.0.0] - 2024-12-14
+### Fixed
+- Rediseño de muchas páginas para que se mantenga una misma estructura
+### Added
+- Creación de javascripts y archivos css para cada página para poder tener todo más organizado
+
+##[7.1.1] - 2024-12-13
+### Fixed
+- Rediseño de la página de inicio
+- Rediseño de la pa´gina desde la que se suben las tablas
+
+##[7.1.0] - 2024-12-13
+### Fixed
+- Corrección en la subida de las tablas pegadas desde excel
+
+##[7.0.0] - 2024-12-13
+### Added
+- Añadida nueva funcionalidad para poder pegar los datos de una tabla y crear un csv que se guarde en la bd
+- Arreglos de pequeños errores
+
+##[6.2.0] - 2024-12-04
+### Fixed
+- Mensaje del archivo seleccionado para la subida
+- Cambios de diseño en upload.html
+
+##[6.1.0] - 2024-12-02
+### Added
+- Rediseño de la página de inicio (index.html)
+- Rediseño del pop-up para la eliminación de tablas de la bd
+
 ##[6.0.0] - 2024-11-30
 ### Added
 - Añadida nueva funcionalidad de eliminar archivos de la base de datos

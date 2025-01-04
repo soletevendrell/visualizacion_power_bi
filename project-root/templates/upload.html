@@ -3,21 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE VISUALIZACIÓN DE DATOS</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Subida de Archivos</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/upload.css">
+    <script src="/static/js/upload.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>SUBIR ARCHIVOS</h1>
+        <h1>SUBIDA DE DATOS</h1>
     </header>
     <main>
-        <p>Suba archivos en formato CSV o Excel para procesarlos y almacenarlos en la base de datos</p>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <input type="file" name="files[]" multiple>
-            <button type="submit">Subir</button>
-        </form>
-        {{ data|safe }}
-        <a href="{{ url_for('index') }}">Volver a Inicio</b>
+        <!-- Opciones de Subida -->
+        <div class="upload-container">
+            <!-- Subir Archivo -->
+            <div class="upload-option">
+                <h2>Subir Archivos</h2>
+                <p>Suba un archivo en formato CSV o Excel:</p>
+                <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+                    <label for="file-upload" class="file-upload-label">
+                        <span>Seleccionar Archivos</span>
+                        <input type="file" name="files[]" id="file-upload" multiple>
+                    </label>
+                    <p id="file-name-display" class="file-name-display">Ningún archivo seleccionado</p>
+                    <button type="submit" class="upload-button">Subir</button>
+                </form>
+                
+                {% if validation_result %}
+                    <div class="validation-result">
+                        {{ validation_result }}
+                    </div>
+                {% endif %}
+                
+            </div>
+
+            <!-- Pegar Datos -->
+            <div class="upload-option">
+                <h2>Pegar Datos</h2>
+                <p>Pegue datos directamente desde Excel:</p>
+                <a href="{{ url_for('paste_tables') }}" class="paste-button">Ir a Pegar Datos</a>
+            </div>
+        </div>
+
+        <!-- Validación de Muestra -->
+        <section class="validate-section">
+            <h2>Validar Muestra</h2>
+            <p>Introduzca los valores para la población y el tamaño de la muestra:</p>
+            <form action="/validate_sample" method="POST" class="validate-form">
+                <input type="number" name="population" placeholder="Población" required>
+                <input type="number" name="sample_size" placeholder="Muestra" required>
+                <button type="submit" class="validate-button">Calcular</button>
+            </form>
+            {% if validation_result %}
+                <div class="validation-result">
+                    <strong>Resultado:</strong> {{ validation_result }}
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Enlace para volver -->
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">Volver a Inicio</a>
+        </div>
     </main>
 </body>
 </html>

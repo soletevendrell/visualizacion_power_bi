@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pegar Datos</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/paste_tables.css">
+    <script src="/static/js/paste_tables.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>PEGAR DATOS</h1>
+    </header>
+    <main>
+        <!-- Sección para pegar datos -->
+        <section class="paste-section">
+            <p>Copie un conjunto de celdas y péguelo en el área a continuación:</p>
+            <textarea id="excelData" placeholder="Pegue aquí los datos copiados"></textarea>
+            <p>Ingrese un nombre para la tabla:</p>
+            <input type="text" id="tableName" placeholder="Nombre de la tabla">
+            <button onclick="processExcelData()">Procesar Datos</button>
+        </section>
+
+        <!-- Sección de vista previa -->
+        <section class="preview-section">
+            <h2>Vista Previa de los Datos</h2>
+            <div id="tablePreview"></div>
+            <button class="save-button" onclick="saveTable()">Guardar en la Base de Datos</button>
+        </section>
+
+        <!-- Enlace para volver al inicio-->
+        <div class="back-link">
+            <a href="{{ url_for('index') }}">Volver a Inicio</a>
+        </div>
+    </main>
+</body>
+</html>

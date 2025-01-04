@@ -1,0 +1,76 @@
+body {
+    font-family: 'Arial';
+    margin: 0;
+    padding: 0;
+    background-color: #f7f9fc;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-image: url('/static/images/logo_fi_upm.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    padding-left: 400px; /* Desplaza el texto hacia la derecha para evitar que se superponga con el logo de la fi upm */
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+a {
+    color: #4a90e2;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #2b669a;
+}
+
+button {
+    font-family: inherit;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #367bb3;
+    color: white;
+}
+
+main {
+    padding: 20px;
+    text-align: center;
+}
+
+/* Botón de volver a inicio */
+.back-link {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-link a {
+    display: inline-block;
+    background-color: #2a6fb4c5;
+    color: white; /* Texto blanco */
+    padding: 0.7rem 1.5rem; /* Tamaño del botón */
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.back-link a:hover {
+    background-color: #336699; /* Color más oscuro al psar el ratón */
+}
