@@ -6,6 +6,8 @@ import pandas as pd
 import sqlite3
 from werkzeug.utils import secure_filename
 from openpyxl import load_workbook
+from openpyxl.utils import range_boundaries
+
 
 app = Flask(__name__)
 
@@ -40,7 +42,25 @@ def upload_file():
         return redirect(url_for('list_tables'))
     return render_template('upload.html')
 
+def process_and_upload_to_sqlite(filepath):
+    try:
+        if filepath.endswith('.csv'):
+            data = pd.read_csv(filepath)
+        elif filepath.endswith(('.xls', '.xlsx')):
+            workbook = load_workbook(filepath, data_only=True)
+            sheet = workbook.active
+            rows = [[cell.value for cell in row] for row in sheet.iter_rows()]
+            data = pd.DataFrame(rows)
+        else:
+            return
 
+        table_name = os.path.splitext(os.path.basename(filepath))[0]
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            data.to_sql(table_name, conn, if_exists='replace', index=False)
+    except Exception as e:
+        print(f"Error al procesar el archivo {filepath}: {e}")
+
+"""
 def process_and_upload_to_sqlite(filepath):
     try:
         # leemos el archivo que puede ser tipo csv o excel
@@ -72,8 +92,32 @@ def process_and_upload_to_sqlite(filepath):
         print(f"Vista previa de los datos:\n{data.head()}")
     except Exception as e:
         print(f"Error al procesar el archivo {filepath}: {e}")
+"""
+"""
+def process_and_upload_to_sqlite(filepath):
+    try:
+        if filepath.endswith(('.xls', '.xlsx')):
+            workbook = load_workbook(filepath, data_only=True)
+            for sheet_name in workbook.sheetnames:
+                sheet = workbook[sheet_name]
+                fill_merged_cells(sheet)
 
+                # Leer datos de la hoja como DataFrame
+                data = pd.DataFrame(sheet.values)
 
+                # Configuración adicional: rellenar columnas vacías
+                data = data.fillna(method='ffill', axis=0)  # Hacia abajo
+                data = data.fillna(method='ffill', axis=1)  # Hacia la derecha
+
+                # Guardar en SQLite
+                table_name = f"{os.path.splitext(os.path.basename(filepath))[0]}_{sheet_name}"
+                conn = sqlite3.connect(DATABASE_PATH)
+                data.to_sql(table_name, conn, if_exists='replace', index=False)
+                print(f"Datos de {sheet_name} guardados correctamente en la tabla {table_name}")
+                conn.close()
+    except Exception as e:
+        print(f"Error al procesar el archivo {filepath}: {e}")
+"""
 @app.route('/validate_sample', methods=['POST'])
 def validate_sample():
     try:
@@ -197,6 +241,17 @@ def fill_combined_cells(rows):
     filled_rows = list(map(list, zip(*filled_columns)))
     return filled_rows
 
+def fill_merged_cells(sheet):
+    """Rellena las celdas combinadas con el valor principal."""
+    for merged_cell_range in sheet.merged_cells.ranges:
+        min_col, min_row, max_col, max_row = range_boundaries(str(merged_cell_range))
+        top_left_value = sheet.cell(row=min_row, column=min_col).value
+
+        for row in range(min_row, max_row + 1):
+            for col in range(min_col, max_col + 1):
+                if sheet.cell(row=row, column=col).value is None:
+                    sheet.cell(row=row, column=col).value = top_left_value
+
 
 @app.route('/paste_tables', methods=['GET'])
 def paste_tables():
@@ -287,6 +342,8 @@ def extract_tables_with_merged_cells(filepath):
 
     return tables
 """
+
+"""
 @app.route('/save_pasted_data', methods=['POST'])
 def save_pasted_data():
     try:
@@ -326,6 +383,31 @@ def save_pasted_data():
         return f"Datos guardados correctamente en la tabla '{table_name}' con {len(df)} filas.", 200
     except Exception as e:
         print(f"Error al guardar los datos: {e}")
+        return f"Error al guardar los datos: {e}", 500
+"""
+@app.route('/save_pasted_data', methods=['POST'])
+def save_pasted_data():
+    try:
+        data = request.json.get('data', '').strip()
+        table_name = request.json.get('tableName', '').strip()
+
+        if not data or not table_name:
+            return "Error: Datos o nombre de tabla no proporcionados", 400
+
+        rows = [row.split('\t') for row in data.split('\n') if row.strip()]
+        max_columns = max(len(row) for row in rows)
+        rows = [row + [""] * (max_columns - len(row)) for row in rows]
+
+        headers = rows[0]
+        if not all(headers):
+            headers = [f"Columna_{i+1}" for i in range(max_columns)]
+
+        df = pd.DataFrame(rows[1:], columns=headers)
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            df.to_sql(table_name, conn, if_exists='replace', index=False)
+
+        return f"Datos guardados en '{table_name}'.", 200
+    except Exception as e:
         return f"Error al guardar los datos: {e}", 500
 
 """
