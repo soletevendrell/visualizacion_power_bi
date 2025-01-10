@@ -3,49 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE VISUALIZACIÓN DE DATOS</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script src="/static/js/join_tables.js"></script>
+    <title>Relacionar Tablas</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/join_tables.css">
+    <script src="/static/js/join_tables.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>Relacionar Tablas</h1>
+        <h1>Relacionar Tablas con Columna en Común</h1>
     </header>
-    <p>Relacione tablas utilizando columnas comunes para obtener vistas combinadas de los datos</p>
-    <form method="POST" action="/join_tables">
-        <h2>Seleccione la Primera Tabla</h2>
-        <select name="table1">
-            {% for table in tables %}
-                <option value="{{ table }}">{{ table }}</option>
-            {% endfor %}
-        </select>
-        <select name="column1">
-            {% for table, cols in columns.items() %}
-                {% for col in cols %}
-                    <option value="{{ col }}">{{ col }}</option>
-                {% endfor %}
-            {% endfor %}
-        </select>
-
-        <h2>Seleccione la Segunda Tabla</h2>
-        <select name="table2">
-            {% for table in tables %}
-                <option value="{{ table }}">{{ table }}</option>
-            {% endfor %}
-        </select>
-        <select name="column2">
-            {% for table, cols in columns.items() %}
-                {% for col in cols %}
-                    <option value="{{ col }}">{{ col }}</option>
-                {% endfor %}
-            {% endfor %}
-        </select>
-
-        <button type="submit">Relacionar</button>
-    </form>
-    <main>
-        {{ data|safe }}
+    <main class="main-container">
+        <form method="POST" action="/join_tables">
+            <h2>Seleccione la Primera Tabla y su Columna</h2>
+            <div class="form-section">
+                <label for="table1">Primera Tabla:</label>
+                <select id="table1" name="table1" onchange="updateColumns('table1', 'column1')">
+                    {% for table in tables %}
+                        <option value="{{ table }}">{{ table }}</option>
+                    {% endfor %}
+                </select>
+                <label for="column1">Columna:</label>
+                <select id="column1" name="column1">
+                    <option value="" disabled selected>Seleccione una columna</option>
+                </select>
+            </div>
+        
+            <h2>Seleccione la Segunda Tabla y su Columna</h2>
+            <div class="form-section">
+                <label for="table2">Segunda Tabla:</label>
+                <select id="table2" name="table2" onchange="updateColumns('table2', 'column2')">
+                    {% for table in tables %}
+                        <option value="{{ table }}">{{ table }}</option>
+                    {% endfor %}
+                </select>
+                <label for="column2">Columna:</label>
+                <select id="column2" name="column2">
+                    <option value="" disabled selected>Seleccione una columna</option>
+                </select>
+            </div>
+        
+            <button type="submit">Relacionar Tablas</button>
+        </form>
+        
         <a href="{{ url_for('index') }}">Volver al Inicio</a>
-    </main>  
+    </main>
 </body>
 </html>

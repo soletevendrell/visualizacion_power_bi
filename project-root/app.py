@@ -1,6 +1,6 @@
 import csv
 import uuid
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import pandas as pd
 import sqlite3
@@ -176,70 +176,59 @@ def delete_table(table_name):
     except Exception as e:
         return f"Error al eliminar la tabla {table_name}: {e}", 500
 
+@app.route('/get_columns', methods=['GET'])
+def get_columns():
+    table_name = request.args.get('table')
+    try:
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(f"PRAGMA table_info({table_name});")
+            columns = [col[1] for col in cursor.fetchall()]
+        return jsonify(columns)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/join_tables', methods=['GET', 'POST'])
 def join_tables():
     if request.method == 'POST':
+        # Lógica para procesar la unión de tablas
         table1 = request.form.get('table1')
         column1 = request.form.get('column1')
         table2 = request.form.get('table2')
         column2 = request.form.get('column2')
-        
+
+        if not (table1 and column1 and table2 and column2):
+            return "Por favor, seleccione todas las opciones.", 400
+
         try:
-            conn = sqlite3.connect(DATABASE_PATH)
-            query = f"""
-            SELECT * FROM {table1}
-            INNER JOIN {table2}
-            ON {table1}.{column1} = {table2}.{column2};
-            """
-            df = pd.read_sql_query(query, conn)
-            conn.close()
-            return render_template('joined_table.html', data=df.to_html(index=False))
+            with sqlite3.connect(DATABASE_PATH) as conn:
+                query = f"""
+                    SELECT * FROM {table1}
+                    INNER JOIN {table2}
+                    ON {table1}.{column1} = {table2}.{column2}
+                """
+                df = pd.read_sql_query(query, conn)
+            return render_template('joined_tables.html', data=df.to_html(index=False))
         except Exception as e:
-            return f"Error al unir tablas: {e}"
+            return f"Error al relacionar tablas: {e}", 500
 
-    # Obtener lista de tablas y columnas para el formulario
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tables = [row[0] for row in cursor.fetchall()]
-    columns = {}
-    for table in tables:
-        cursor.execute(f"PRAGMA table_info({table});")
-        columns[table] = [col[1] for col in cursor.fetchall()]
-    conn.close()
-    return render_template('join_tables.html', tables=tables, columns=columns)
+    # Lógica para manejar la carga inicial del formulario (GET)
+    try:
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            tables = [row[0] for row in cursor.fetchall()]
 
-def fill_combined_cells(rows):
+            # Obtener columnas para cada tabla
+            columns = {}
+            for table in tables:
+                cursor.execute(f"PRAGMA table_info({table});")
+                columns[table] = [col[1] for col in cursor.fetchall()]
 
-    #Detecta y rellena celdas combinadas en una tabla.
-    #Las celdas vacías en una fila heredan el valor más cercano hacia la izquierda.
-    #Las celdas vacías en una columna heredan el valor más cercano hacia arriba.
-    # Rellenar horizontalmente (izquierda -> derecha)
-    for row in rows:
-        for i in range(1, len(row)):
-            if row[i] is None or (isinstance(row[i], str) and not row[i].strip()):
-                row[i] = row[i - 1]
+        return render_template('join_tables.html', tables=tables, columns=columns)
+    except Exception as e:
+        return f"Error al cargar las tablas: {e}"
 
-    # Transponer filas para trabajar verticalmente (columnas)
-    columns = list(zip(*rows))
-
-    # Rellenar verticalmente (arriba -> abajo)
-    filled_columns = []
-    for column in columns:
-        filled_column = []
-        for i in range(len(column)):
-            if column[i].strip():  # Si la celda tiene valor
-                filled_column.append(column[i])
-            elif i > 0:  # Si está vacía, toma el valor superior
-                filled_column.append(filled_column[-1])
-            else:  # Si es la primera celda y está vacía
-                filled_column.append("")
-        filled_columns.append(filled_column)
-
-    # Volver a transponer para devolver las filas al formato original
-    filled_rows = list(map(list, zip(*filled_columns)))
-    return filled_rows
 
 def fill_merged_cells(sheet):
     """Rellena las celdas combinadas con el valor principal."""

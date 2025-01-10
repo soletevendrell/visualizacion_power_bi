@@ -1,6 +1,3 @@
-/* const columns = {{ columns | tojson | safe }}; */
-console.log({});
-
 function updateColumns(tableId, columnId) {
     const tableSelect = document.getElementById(tableId);
     const columnSelect = document.getElementById(columnId);
@@ -8,14 +5,15 @@ function updateColumns(tableId, columnId) {
 
     columnSelect.innerHTML = '<option value="" disabled selected>Seleccione una columna</option>';
 
-    if (selectedTable && {}[selectedTable]) {
-        {}[selectedTable].forEach(col => {
-            const option = document.createElement('option');
-            option.value = col;
-            option.textContent = col;
-            columnSelect.appendChild(option);
-        });
-    }
+    fetch(`/get_columns?table=${selectedTable}`)
+        .then(response => response.json())
+        .then(columns => {
+            columns.forEach(col => {
+                const option = document.createElement('option');
+                option.value = col;
+                option.textContent = col;
+                columnSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error al cargar columnas:', error));
 }
-
-window.updateColumns = updateColumns;
